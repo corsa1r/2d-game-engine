@@ -4,6 +4,7 @@ import { KeyboardInput } from "../engine/input/keyboardInput"
 import Vector2D from "../engine/math/vector";
 import Game from "./game";
 import to from "../engine/utils/await";
+import rand from "../engine/math/rand";
 
 export default class Player extends GameObject {
 
@@ -21,6 +22,7 @@ export default class Player extends GameObject {
         let sprite = new Sprite(await Assets.load('./game/assets/test/player.png'))
         sprite.width = 40
         sprite.height = 40
+        sprite.name = 'texture'
         this.addChild(sprite)
     }
 
@@ -39,6 +41,11 @@ export default class Player extends GameObject {
 
         if (KeyboardInput.states.KeyS) {
             this.physicsProperties.force.y = this.moveSpeed
+        }
+
+        if (KeyboardInput.states.Space) {
+            this.x = rand(100, 1000)
+            this.y = rand(100, 1000)
         }
     }
 

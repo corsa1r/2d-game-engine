@@ -1,5 +1,4 @@
 import Level from "../engine/level"
-import Renderer from "../engine/rendering/renderer"
 import GameLoop from "../engine/time/gameLoop"
 import to from "../engine/utils/await"
 
@@ -9,7 +8,6 @@ export default class Game {
 
     constructor(
         public level: Level,
-        // public renderer: Renderer
     ) {
         Game.level = this.level
     }
@@ -33,6 +31,5 @@ export default class Game {
 
     private tick() {
         this.level.update(GameLoop.delta)
-        // this.renderer.render(this.level.gameObjects)
     }
 }

@@ -16,6 +16,7 @@
     "webpack-cli": "5.1.4"
   },
   "dependencies": {
-    "pixi.js": "7.2.4"
+    "pixi-viewport": "5.0.1",
+    "pixi.js": "7.1.4"
   }
 }
