@@ -10,4 +10,8 @@ export default abstract class Resource<T> {
     public resource: T | null = null
 
     abstract load(): Promise<Resource<T>>
+    onLoad() {
+        this.loaded = true
+        this.loading = false
+    }
 }

@@ -19,10 +19,7 @@ export default class Texture extends Resource<HTMLImageElement> {
         this.resource.width = this.size.x
         this.resource.height = this.size.y
         this.resource.src = this.resourcePath
-        this.resource.onload = () => {
-            this.loaded = true
-            this.loading = false
-        }
+        this.resource.onload = this.onLoad.bind(this)
 
         return Promise.resolve(this)
     }
