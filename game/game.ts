@@ -1,5 +1,4 @@
 import Level from "../engine/level"
-import GameLoop from "../engine/time/gameLoop"
 import to from "../engine/utils/await"
 
 export default class Game {
@@ -21,15 +20,5 @@ export default class Game {
         if (errorLoadingGame) return Promise.reject(errorLoadingGame)
 
         return Promise.resolve(this)
-    }
-
-    public start() {
-        // this.renderer.init()
-        GameLoop.tick = () => this.tick()
-        GameLoop.start()
-    }
-
-    private tick() {
-        this.level.update(GameLoop.delta)
     }
 }

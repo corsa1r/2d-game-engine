@@ -108,25 +108,18 @@ import generateLevel from './generate-level'
 
 (async () => {
     const app = new Application({
+        resolution: devicePixelRatio || 1,
         width: window.innerWidth,
         height: window.innerHeight,
-        resolution: window.devicePixelRatio,
-        antialias: true,
     })
 
     let input = new KeyboardInput()
     let level = new Level('default')
 
-    // The application will create a canvas element for you that you
-    // can then insert into the DOM
-    document.body.appendChild(<HTMLCanvasElement>app.view);
-
     let player = new Player()
-    let rect = new Rect()
 
     generateLevel(level, player)
 
-    // create viewport
     const viewport = new Viewport({
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
@@ -135,22 +128,24 @@ import generateLevel from './generate-level'
         events: app.renderer.events
     });
 
-    window.onresize = () => viewport.resize(window.innerWidth, window.innerHeight)
+    window.addEventListener('resize', () => {
+        viewport.resize(window.innerWidth, window.innerHeight, 1000, 1000)
+    })
 
+    document.body.appendChild(<HTMLCanvasElement>app.view);
 
     app.stage.addChild(viewport)
 
     level.addChild(player)
-    level.addChild(rect)
 
     viewport.addChild(level)
     viewport
-        .drag()
-        .pinch()
+        // .drag()
+        // .pinch()
         .wheel({
             percent: 1
         })
-        .decelerate()
+    // .decelerate()
 
     viewport.follow(player, {
         radius: 100,

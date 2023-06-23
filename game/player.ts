@@ -4,6 +4,9 @@ import { KeyboardInput } from "../engine/input/keyboardInput"
 import Vector2D from "../engine/math/vector"
 import rand from "../engine/math/rand"
 import Cooldown from "../engine/time/cooldown"
+import { CollisionDirection, GeneralDirection } from "../engine/physics/physicsConstants"
+import Door from "./objects/door"
+import distance from "../engine/math/distance"
 
 export default class Player extends GameObject {
 
@@ -50,6 +53,19 @@ export default class Player extends GameObject {
             this.physicsProperties.velocity.multiplyBy(0)
             this.x = rand(100, 4000)
             this.y = rand(100, 4000)
+        }
+    }
+
+    onCollision(bb: GameObject, collisionDirection: CollisionDirection, generalDirection?: GeneralDirection | undefined): void {
+        if (bb instanceof Door) {
+            if (KeyboardInput.states.KeyE && bb.abilities.toToggle.ready) {
+                bb.toggle()
+            }
+
+            if (bb.open && distance(this.position, bb.position) <= 10) {
+                bb.physicsProperties.enabled = false
+                window.location.reload()
+            }
         }
     }
 }

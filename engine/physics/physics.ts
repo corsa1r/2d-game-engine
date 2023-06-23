@@ -22,7 +22,7 @@ export default class Physics {
 
                 if (direction === CollisionDirection.HORIZONTAL) {
                     let bounce_x = -aa.physicsProperties.bounce.x / aa.physicsProperties.mass
-                    if (aa.physicsProperties.direction.x > 0 && aa.right > bb.left) {
+                    if ((aa.physicsProperties.direction.x > 0 || bb.physicsProperties.isVolume) && aa.right > bb.left) {
                         aa.onCollision(bb, direction, GeneralDirection.RIGHT)
                         if (bb.physicsProperties.isVolume) continue;
 
@@ -30,7 +30,7 @@ export default class Physics {
                         aa.physicsProperties.velocity.x *= bounce_x // stop acceleration in right and bounce
                         aa.physicsProperties.force.x = 0
                     }
-                    if (aa.physicsProperties.direction.x < 0 && aa.left < bb.right) {
+                    if ((aa.physicsProperties.direction.x < 0 || bb.physicsProperties.isVolume) && aa.left < bb.right) {
                         aa.onCollision(bb, direction, GeneralDirection.LEFT)
                         if (bb.physicsProperties.isVolume) continue;
 
@@ -41,7 +41,7 @@ export default class Physics {
 
                 } else if (direction === CollisionDirection.VERTICAL) {
                     let bounce_y = -aa.physicsProperties.bounce.y / aa.physicsProperties.mass
-                    if (aa.physicsProperties.direction.y > 0 && aa.bottom > bb.top) {
+                    if ((aa.physicsProperties.direction.y > 0 || bb.physicsProperties.isVolume) && aa.bottom > bb.top) {
                         aa.onCollision(bb, direction, GeneralDirection.DOWN)
                         if (bb.physicsProperties.isVolume) continue;
 
@@ -49,7 +49,7 @@ export default class Physics {
                         aa.physicsProperties.velocity.y *= bounce_y // stop acceleration in top and bounce
                         aa.physicsProperties.force.y = 0
                     }
-                    if (aa.physicsProperties.direction.y < 0 && aa.top < bb.bottom) {
+                    if ((aa.physicsProperties.direction.y < 0 || bb.physicsProperties.isVolume) && aa.top < bb.bottom) {
                         aa.onCollision(bb, direction, GeneralDirection.UP)
                         if (bb.physicsProperties.isVolume) continue;
 
