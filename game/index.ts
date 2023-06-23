@@ -117,8 +117,6 @@ import generateLevel from './generate-level'
     let input = new KeyboardInput()
     let level = new Level('default')
 
-    generateLevel(level)
-
     // The application will create a canvas element for you that you
     // can then insert into the DOM
     document.body.appendChild(<HTMLCanvasElement>app.view);
@@ -126,15 +124,14 @@ import generateLevel from './generate-level'
     let player = new Player()
     let rect = new Rect()
 
-    player.position.x = 1000
-    player.position.y = 1000
+    generateLevel(level, player)
 
     // create viewport
     const viewport = new Viewport({
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
-        worldWidth: 1600,
-        worldHeight: 1600,
+        worldWidth: 1000,
+        worldHeight: 1000,
         events: app.renderer.events
     });
 
@@ -162,6 +159,8 @@ import generateLevel from './generate-level'
     })
 
     // Listen for frame updates
+    app.ticker.maxFPS = 60
+
     app.ticker.add(() => {
         level.update(app.ticker.deltaMS / 1000)
     })

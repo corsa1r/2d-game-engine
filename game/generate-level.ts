@@ -1,15 +1,16 @@
-import Level from "../engine/level";
-import chance from "../engine/math/chance";
-import rand from "../engine/math/rand";
-import Grass from "./objects/grass";
-import Rect from "./rect";
+import Level from "../engine/level"
+import chance from "../engine/math/chance"
+import rand from "../engine/math/rand"
+import Grass from "./objects/grass"
+import Player from "./player"
+import Rect from "./rect"
 
-export default function generateLevel(level: Level) {
+export default function generateLevel(level: Level, player: Player) {
 
     // -------------------------------------------------------------------------------------
 
-    let mapWidth = rand(68, 68)
-    let mapHeight = rand(68, 68)
+    let mapWidth = rand(100, 120)
+    let mapHeight = rand(100, 140)
 
     let map: number[][] = []
 
@@ -25,7 +26,7 @@ export default function generateLevel(level: Level) {
                 continue
             }
 
-            if (chance(11)) {
+            if (chance(40)) {
                 map[row][col] = 0
             } else {
                 map[row][col] = 1
@@ -53,4 +54,16 @@ export default function generateLevel(level: Level) {
         }
     }
     // -------------------------------------------------------------------------------------
+
+    do {
+        var x = rand(0, mapHeight - 1)
+        var y = rand(0, mapWidth - 1)
+
+        if (map[x][y] === 0) {
+            player.position.x = y * 50
+            player.position.y = x * 50
+            break
+        }
+
+    } while (map[x][y] === 1)
 }

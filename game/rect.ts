@@ -1,6 +1,5 @@
-import { Assets, Sprite, Texture, spritesheetAsset } from "pixi.js"
+import { Assets, Sprite } from "pixi.js"
 import GameObject from "../engine/gameObject"
-import Game from "./game"
 
 export default class Rect extends GameObject {
 
