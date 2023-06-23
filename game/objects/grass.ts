@@ -1,3 +1,4 @@
+import { Assets, Sprite, Texture } from "pixi.js"
 import GameObject from "../../engine/gameObject"
 import rand from "../../engine/math/rand"
 import Game from "../game"
@@ -9,19 +10,21 @@ export default class Grass extends GameObject {
 
     constructor() {
         super()
-        this.tags.push('grass')
-        this.physicsProperties.enabled = false
-        // this.physicsProperties.isStatic = true
-        // this.physicsProperties.isVolume = true
+        this.physicsProperties.isStatic = true
+        this.physicsProperties.isVolume = true
+        this.tags.push('rock')
+
+        this.init()
+    }
+
+    async init() {
+        let sprite = new Sprite(await Assets.load('./game/assets/test/floor.png'))
+        sprite.width = 50
+        sprite.height = 50
+        this.addChild(sprite)
     }
 
     update(delta: number): void {
 
     }
-
-    render(context: CanvasRenderingContext2D): void {
-        let image = <CanvasImageSource>Game.level.resources.textures[this.textureName].resource
-        context.drawImage(image, 0, 0, 50, 50)
-    }
-
 }

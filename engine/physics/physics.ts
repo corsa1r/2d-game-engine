@@ -1,4 +1,5 @@
 import GameObject from "../gameObject"
+import distance from "../math/distance"
 import Vector2D from "../math/vector"
 
 export enum Directions {
@@ -21,7 +22,7 @@ export default class Physics {
             // skip collisions with disabled physics for GameObject
             if (aa === bb || !aa.physicsProperties.enabled || !bb.physicsProperties.enabled) continue
 
-            if (aa.position.distance(bb.position) < 500 && Physics.detectRectInRectCollision(aa, bb)) {
+            if (distance(aa.position, bb.position) < 500 && Physics.detectRectInRectCollision(aa, bb)) {
                 aa.onCollision(bb)
 
                 if (bb.physicsProperties.isVolume) continue; // don't resolve if other object is a volume
@@ -29,7 +30,7 @@ export default class Physics {
                 if (direction === Directions.HORIZONTAL) {
                     let bounce_x = -aa.physicsProperties.bounce.x / aa.physicsProperties.mass
                     if (aa.physicsProperties.direction.x > 0 && aa.right > bb.left) {
-                        aa.position.x = bb.left - aa.size.x
+                        aa.position.x = bb.left - aa.width
                         aa.physicsProperties.velocity.x *= bounce_x // stop acceleration in right and bounce
                     }
                     if (aa.physicsProperties.direction.x < 0 && aa.left < bb.right) {
@@ -40,7 +41,7 @@ export default class Physics {
                 } else if (direction === Directions.VERTICAL) {
                     let bounce_y = -aa.physicsProperties.bounce.y / aa.physicsProperties.mass
                     if (aa.physicsProperties.direction.y > 0 && aa.bottom > bb.top) {
-                        aa.position.y = bb.top - aa.size.y
+                        aa.position.y = bb.top - aa.height
                         aa.physicsProperties.velocity.y *= bounce_y // stop acceleration in top and bounce
                     }
                     if (aa.physicsProperties.direction.y < 0 && aa.top < bb.bottom) {

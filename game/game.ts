@@ -9,7 +9,7 @@ export default class Game {
 
     constructor(
         public level: Level,
-        public renderer: Renderer
+        // public renderer: Renderer
     ) {
         Game.level = this.level
     }
@@ -26,13 +26,13 @@ export default class Game {
     }
 
     public start() {
-        this.renderer.init()
+        // this.renderer.init()
         GameLoop.tick = () => this.tick()
         GameLoop.start()
     }
 
     private tick() {
         this.level.update(GameLoop.delta)
-        this.renderer.render(this.level.gameObjects)
+        // this.renderer.render(this.level.gameObjects)
     }
 }

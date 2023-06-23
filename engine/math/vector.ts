@@ -42,10 +42,6 @@ export default class Vector2D {
         return this
     }
 
-    distance(fromVector: Vector2D): number {
-        return Math.sqrt(Math.pow((this.x - fromVector.x), 2) + Math.pow((this.y - fromVector.y), 2))
-    }
-
     toZero(vector: Vector2D, threshold: number): Vector2D {
         if (this.x < 0 - threshold) {
             this.x += vector.x

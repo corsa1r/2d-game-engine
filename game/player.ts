@@ -1,7 +1,9 @@
+import { Assets, Sprite, Texture } from "pixi.js";
 import GameObject from "../engine/gameObject"
 import { KeyboardInput } from "../engine/input/keyboardInput"
 import Vector2D from "../engine/math/vector";
 import Game from "./game";
+import to from "../engine/utils/await";
 
 export default class Player extends GameObject {
 
@@ -9,13 +11,17 @@ export default class Player extends GameObject {
 
     constructor() {
         super();
-        this.tags.push('PLAYER')
-        this.size.x = 32
-        this.size.y = 32
+        this.tags.push('player')
         this.physicsProperties.mass = 0.8
         this.physicsProperties.friction.copy(new Vector2D(3, 3))
-        this.physicsProperties.bounce.x = 0
-        this.physicsProperties.bounce.y = 0
+        this.init()
+    }
+
+    async init() {
+        let sprite = new Sprite(await Assets.load('./game/assets/test/player.png'))
+        sprite.width = 40
+        sprite.height = 40
+        this.addChild(sprite)
     }
 
     update(delta: number): void {
@@ -36,9 +42,9 @@ export default class Player extends GameObject {
         }
     }
 
-    render(context: CanvasRenderingContext2D): void {
-        context.drawImage(<CanvasImageSource>Game.level.resources.textures.player.resource, 0, 0, 32, 32)
-    }
+    // render(context: CanvasRenderingContext2D): void {
+    //     context.drawImage(<CanvasImageSource>Game.level.resources.textures.player.resource, 0, 0, 32, 32)
+    // }
 
     onCollision(gameObject: GameObject): void {
         // console.warn(gameObject.tags)

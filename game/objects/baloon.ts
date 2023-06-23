@@ -16,11 +16,11 @@ export default class Baloon extends GameObject {
     update(delta: number): void {
     }
 
-    render(context: CanvasRenderingContext2D): void {
-        context.rect(0, 0, this.size.x, this.size.y)
-        context.fillStyle = '#ffff00'
-        context.fill()
-    }
+    // render(context: CanvasRenderingContext2D): void {
+    //     context.rect(0, 0, this.size.x, this.size.y)
+    //     context.fillStyle = '#ffff00'
+    //     context.fill()
+    // }
 
     onCollision(bb: GameObject): void {
 
