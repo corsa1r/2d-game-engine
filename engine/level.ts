@@ -15,11 +15,11 @@ export default class Level extends Container<GameObject> {
     update(delta: number) {
         this.children.forEach((gameObject) => {
             if (!gameObject.enabled) return
-
-            // handle Input
+            // Update cooldowns
+            Object.values(gameObject.abilities).forEach((cd) => cd.update(delta))
+            // Handle Input
             gameObject.update(delta)
-
-            // Update positions
+            // Correct positions
             Physics.update(delta, gameObject, this.children)
         })
     }

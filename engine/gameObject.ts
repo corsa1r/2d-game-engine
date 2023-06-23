@@ -1,12 +1,16 @@
 import { Container } from "pixi.js"
 import Vector2D from "./math/vector"
 import PhysicsProperties from "./physics/physicsProperties"
+import Cooldown from "./time/cooldown"
+import Flag from "./states/flag"
+import { CollisionDirection, GeneralDirection } from "./physics/physicsConstants"
 
 export default abstract class GameObject extends Container {
+
+    public abilities: { [key: string]: Cooldown } = {}
+    public flags: { [key: string]: Flag } = {}
     public tags: string[] = []
     public enabled: boolean = true
-    // public position: Vector2D = new Vector2D(0, 0)
-    // public size: Vector2D = new Vector2D(50, 50)
     public physicsProperties = new PhysicsProperties()
 
     applyForce(vector: Vector2D) {
@@ -29,8 +33,7 @@ export default abstract class GameObject extends Container {
         return this.position.y + this.height
     }
 
-    // Handles Game Logic
     abstract update(delta: number): void
 
-    onCollision(bb: GameObject) { }
+    onCollision(bb: GameObject, collisionDirection: CollisionDirection, generalDirection?: GeneralDirection) { }
 }

@@ -1,21 +1,23 @@
-import { Assets, Sprite, Texture } from "pixi.js";
+import { Assets, Sprite } from "pixi.js"
 import GameObject from "../engine/gameObject"
 import { KeyboardInput } from "../engine/input/keyboardInput"
-import Vector2D from "../engine/math/vector";
-import Game from "./game";
-import to from "../engine/utils/await";
-import rand from "../engine/math/rand";
+import Vector2D from "../engine/math/vector"
+import rand from "../engine/math/rand"
+import Cooldown from "../engine/time/cooldown"
 
 export default class Player extends GameObject {
 
-    public moveSpeed: number = 5
+    public moveSpeed: number = 25
 
     constructor() {
         super();
         this.tags.push('player')
-        this.physicsProperties.mass = 0.8
-        this.physicsProperties.friction.copy(new Vector2D(3, 3))
+        this.physicsProperties.mass = 5
+        this.physicsProperties.friction.copy(new Vector2D(20, 20))
+        this.physicsProperties.bounce.multiplyBy(0.1)
         this.init()
+
+        this.abilities.teleport = new Cooldown(1)
     }
 
     async init() {
@@ -43,17 +45,11 @@ export default class Player extends GameObject {
             this.physicsProperties.force.y = this.moveSpeed
         }
 
-        if (KeyboardInput.states.Space) {
-            this.x = rand(100, 1000)
-            this.y = rand(100, 1000)
+        if (KeyboardInput.states.KeyT && this.abilities.teleport.ready) {
+            this.abilities.teleport.activate()
+            this.physicsProperties.velocity.multiplyBy(0)
+            this.x = rand(100, 4000)
+            this.y = rand(100, 4000)
         }
-    }
-
-    // render(context: CanvasRenderingContext2D): void {
-    //     context.drawImage(<CanvasImageSource>Game.level.resources.textures.player.resource, 0, 0, 32, 32)
-    // }
-
-    onCollision(gameObject: GameObject): void {
-        // console.warn(gameObject.tags)
     }
 }

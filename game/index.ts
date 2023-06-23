@@ -156,9 +156,9 @@ import generateLevel from './generate-level'
         .decelerate()
 
     viewport.follow(player, {
-        radius: 200,
-        acceleration: .3,
-        speed: .1
+        radius: 100,
+        acceleration: 1,
+        speed: 1
     })
 
     // Listen for frame updates
