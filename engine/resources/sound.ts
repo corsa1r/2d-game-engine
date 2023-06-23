@@ -14,7 +14,10 @@ export default class Sound extends Resource<HTMLAudioElement> {
 
         this.loading = true
         this.resource = new Audio(this.resourcePath)
-        this.resource.onload = () => this.loaded = this.loading = false
+        this.resource.onload = () => {
+            this.loaded = true
+            this.loading = false
+        }
 
         return Promise.resolve(this)
     }
