@@ -7,12 +7,12 @@ import Grass from "./objects/grass"
 import Player from "./player"
 import Rect from "./rect"
 
-export default function generateLevel(level: Level, player: Player) {
+export default function generateLevel(level: Level, player: Player): Door {
 
     // -------------------------------------------------------------------------------------
 
-    let mapWidth = rand(25, 25)
-    let mapHeight = rand(20, 20)
+    let mapWidth = rand(50, 65)
+    let mapHeight = rand(50, 65)
     let size = 50
     let map: number[][] = []
 
@@ -34,7 +34,7 @@ export default function generateLevel(level: Level, player: Player) {
 
     for (let x = 0; x < mapWidth; x++) {
         for (let y = 0; y < mapHeight; y++) {
-            if (map[x][y] === 0 && chance(25)) {
+            if (map[x][y] === 0 && chance(45)) {
                 map[x][y] = 1
             }
         }
@@ -44,13 +44,20 @@ export default function generateLevel(level: Level, player: Player) {
     map[doorPosition[0]][doorPosition[1]] = 2
 
     let objectMap = [Grass, Rect, Door]
-
+    let theDoor = null
     for (let x = 0; x < mapWidth; x++) {
         for (let y = 0; y < mapHeight; y++) {
-            if (map[x][y] === 0) continue
+            // if (map[x][y] === 0) continue
             let gameObject = new objectMap[map[x][y]]()
+            if (map[x][y] === 2) theDoor = gameObject
             gameObject.x = x * size
             gameObject.y = y * size
+            if (map[x][y] !== 2) {
+                let grass = new Grass()
+                grass.x = gameObject.x
+                grass.y = gameObject.y
+                level.addChild(grass)
+            }
             level.addChild(gameObject)
         }
     }
@@ -59,8 +66,10 @@ export default function generateLevel(level: Level, player: Player) {
     player.x = playerPosition[0] * size
     player.y = playerPosition[1] * size
 
-    console.log(map)
+    // console.log(map)
     // console.warn('random', randomElementFromMatrix(map, 0))
+
+    return <Door>theDoor
 }
 
 function randomElementFromMatrix(matrix: number[][], value: number) {

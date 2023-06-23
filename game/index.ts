@@ -118,7 +118,7 @@ import generateLevel from './generate-level'
 
     let player = new Player()
 
-    generateLevel(level, player)
+    let door = generateLevel(level, player)
 
     const viewport = new Viewport({
         screenWidth: window.innerWidth,
@@ -147,11 +147,11 @@ import generateLevel from './generate-level'
         })
     // .decelerate()
 
-    viewport.follow(player, {
-        radius: 100,
-        acceleration: 1,
-        speed: 1
-    })
+    viewport.follow(door)
+
+    setTimeout(() => {
+        viewport.follow(player, { speed: 5 })
+    }, 3000)
 
     // Listen for frame updates
     app.ticker.maxFPS = 60

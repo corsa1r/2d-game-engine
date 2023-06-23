@@ -26,7 +26,7 @@ export default class Physics {
                         aa.onCollision(bb, direction, GeneralDirection.RIGHT)
                         if (bb.physicsProperties.isVolume) continue;
 
-                        aa.position.x = bb.left - aa.width
+                        aa.position.x = bb.left - aa.physicsProperties.size.x
                         aa.physicsProperties.velocity.x *= bounce_x // stop acceleration in right and bounce
                         aa.physicsProperties.force.x = 0
                     }
@@ -45,7 +45,7 @@ export default class Physics {
                         aa.onCollision(bb, direction, GeneralDirection.DOWN)
                         if (bb.physicsProperties.isVolume) continue;
 
-                        aa.position.y = bb.top - aa.height
+                        aa.position.y = bb.top - aa.physicsProperties.size.y
                         aa.physicsProperties.velocity.y *= bounce_y // stop acceleration in top and bounce
                         aa.physicsProperties.force.y = 0
                     }

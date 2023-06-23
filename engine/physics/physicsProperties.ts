@@ -9,6 +9,8 @@ export default class PhysicsProperties {
     public isVolume: boolean = false
     // direction of the movement
     public direction: Vector2D = new Vector2D(0, 0)
+    // size
+    public size: Vector2D = new Vector2D(0, 0)
     // velocity directions
     public velocity: Vector2D = new Vector2D(0, 0)
     // force directions

@@ -11,9 +11,10 @@ export default class Door extends GameObject {
         super()
         this.physicsProperties.isStatic = true
         this.physicsProperties.isVolume = true
+        this.physicsProperties.size.set(50, 50)
         this.tags.push('rock')
         this.init()
-
+        this.killable = false
         this.abilities.toToggle = new Cooldown(.35)
     }
 
@@ -30,18 +31,21 @@ export default class Door extends GameObject {
 
     async toggle() {
         this.removeChildren()
+
         if (this.open) {
             let sprite = new Sprite(await Assets.load('./game/assets/test/door_closed.png'))
             sprite.width = 50
             sprite.height = 50
             this.addChild(sprite)
+            this.open = false
         } else {
             let sprite = new Sprite(await Assets.load('./game/assets/test/door_open.png'))
             sprite.width = 50
             sprite.height = 50
             this.addChild(sprite)
+            this.open = true
         }
-        this.open = !this.open
+
         this.abilities.toToggle.activate()
     }
 }

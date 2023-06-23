@@ -30,6 +30,12 @@ export default class Vector2D {
         this._y = v
     }
 
+    set(x: number, y: number): Vector2D {
+        this.x = x
+        this.y = y
+        return this
+    }
+
     add(vector: Vector2D): Vector2D {
         this.x += vector.x
         this.y += vector.y
