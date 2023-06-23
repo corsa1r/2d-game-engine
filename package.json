@@ -1,5 +1,5 @@
 {
-  "name": "zelda",
+  "name": "2d-game",
   "version": "1.0.0",
   "description": "",
   "main": "game/game.ts",
