@@ -26,7 +26,7 @@ export default function generateLevel(level: Level, player: Player) {
                 continue
             }
 
-            if (chance(40)) {
+            if (chance(10)) {
                 map[row][col] = 0
             } else {
                 map[row][col] = 1
