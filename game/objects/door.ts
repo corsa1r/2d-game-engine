@@ -12,7 +12,7 @@ export default class Door extends GameObject {
         this.physicsProperties.isStatic = true
         this.physicsProperties.isVolume = true
         this.physicsProperties.size.set(50, 50)
-        this.tags.push('rock')
+        this.tags.push('door')
         this.init()
         this.killable = false
         this.abilities.toToggle = new Cooldown(.35)

@@ -11,14 +11,8 @@ export default class PhysicsProperties {
     public direction: Vector2D = new Vector2D(0, 0)
     // size
     public size: Vector2D = new Vector2D(0, 0)
-    // velocity directions
-    public velocity: Vector2D = new Vector2D(0, 0)
-    // force directions
-    public force: Vector2D = new Vector2D(0, 0)
-    // surface friction
-    public friction: Vector2D = new Vector2D(1, 1)
-    // bounce
-    public bounce: Vector2D = new Vector2D(.3, .3)
-    // mass
-    public mass: number = 1
+    // size
+    public speed: Vector2D = new Vector2D(200, 200)
+    // list of GameObject tags that this object ignores collisions with
+    public ignoreCollisionsWithTags: string[] = []
 }

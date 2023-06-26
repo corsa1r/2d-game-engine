@@ -114,11 +114,10 @@ import generateLevel from './generate-level'
     })
 
     let input = new KeyboardInput()
-    let level = new Level('default')
-
+    Game.level = new Level('default')
     let player = new Player()
 
-    let door = generateLevel(level, player)
+    let door = generateLevel(Game.level, player)
 
     const viewport = new Viewport({
         screenWidth: window.innerWidth,
@@ -136,9 +135,9 @@ import generateLevel from './generate-level'
 
     app.stage.addChild(viewport)
 
-    level.addChild(player)
+    Game.level.addChild(player)
 
-    viewport.addChild(level)
+    viewport.addChild(Game.level)
     viewport
         // .drag()
         // .pinch()
@@ -157,6 +156,6 @@ import generateLevel from './generate-level'
     app.ticker.maxFPS = 60
 
     app.ticker.add(() => {
-        level.update(app.ticker.deltaMS / 1000)
+        Game.level.update(app.ticker.deltaMS / 1000)
     })
 })()

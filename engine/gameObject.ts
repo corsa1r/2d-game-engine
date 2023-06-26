@@ -37,10 +37,6 @@ export default abstract class GameObject extends Container {
         return [damage, isCrit]
     }
 
-    applyForce(vector: Vector2D) {
-        this.physicsProperties.force.add(vector)
-    }
-
     get left() {
         return this.position.x
     }

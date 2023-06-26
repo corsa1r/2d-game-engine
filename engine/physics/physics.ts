@@ -1,3 +1,5 @@
+import Bullet from "../../game/objects/bullet"
+import Player from "../../game/player"
 import GameObject from "../gameObject"
 import distance from "../math/distance"
 import Vector2D from "../math/vector"
@@ -15,48 +17,39 @@ export default class Physics {
 
     static resolveRectInRectCollision(aa: GameObject, gameObjects: GameObject[], direction: CollisionDirection) {
         for (let bb of gameObjects) {
-            // skip collisions with disabled physics for GameObject
             if (aa === bb || !aa.physicsProperties.enabled || !bb.physicsProperties.enabled) continue
+            if (distance(aa.position, bb.position) > 500) continue
+            if (!Physics.detectRectInRectCollision(aa, bb)) continue
+            if (aa.physicsProperties.ignoreCollisionsWithTags.some((igoreTag) => bb.tags.includes(igoreTag))) continue
 
-            if (distance(aa.position, bb.position) < 500 && Physics.detectRectInRectCollision(aa, bb)) {
+            if (direction === CollisionDirection.HORIZONTAL) {
+                if ((aa.physicsProperties.direction.x > 0 || bb.physicsProperties.isVolume) && aa.right > bb.left) {
+                    aa.onCollision(bb, direction, GeneralDirection.RIGHT)
+                    if (bb.physicsProperties.isVolume) continue
 
-                if (direction === CollisionDirection.HORIZONTAL) {
-                    let bounce_x = -aa.physicsProperties.bounce.x / aa.physicsProperties.mass
-                    if ((aa.physicsProperties.direction.x > 0 || bb.physicsProperties.isVolume) && aa.right > bb.left) {
-                        aa.onCollision(bb, direction, GeneralDirection.RIGHT)
-                        if (bb.physicsProperties.isVolume) continue;
+                    aa.position.x = bb.left - aa.physicsProperties.size.x
+                }
+                if ((aa.physicsProperties.direction.x < 0 || bb.physicsProperties.isVolume) && aa.left < bb.right) {
+                    aa.onCollision(bb, direction, GeneralDirection.LEFT)
+                    if (bb.physicsProperties.isVolume) continue
 
-                        aa.position.x = bb.left - aa.physicsProperties.size.x
-                        aa.physicsProperties.velocity.x *= bounce_x // stop acceleration in right and bounce
-                        aa.physicsProperties.force.x = 0
-                    }
-                    if ((aa.physicsProperties.direction.x < 0 || bb.physicsProperties.isVolume) && aa.left < bb.right) {
-                        aa.onCollision(bb, direction, GeneralDirection.LEFT)
-                        if (bb.physicsProperties.isVolume) continue;
+                    aa.position.x = bb.right
+                }
 
-                        aa.position.x = bb.right
-                        aa.physicsProperties.velocity.x *= bounce_x // stop acceleration in left and bounce
-                        aa.physicsProperties.force.x = 0
-                    }
+            }
 
-                } else if (direction === CollisionDirection.VERTICAL) {
-                    let bounce_y = -aa.physicsProperties.bounce.y / aa.physicsProperties.mass
-                    if ((aa.physicsProperties.direction.y > 0 || bb.physicsProperties.isVolume) && aa.bottom > bb.top) {
-                        aa.onCollision(bb, direction, GeneralDirection.DOWN)
-                        if (bb.physicsProperties.isVolume) continue;
+            if (direction === CollisionDirection.VERTICAL) {
+                if ((aa.physicsProperties.direction.y > 0 || bb.physicsProperties.isVolume) && aa.bottom > bb.top) {
+                    aa.onCollision(bb, direction, GeneralDirection.DOWN)
+                    if (bb.physicsProperties.isVolume) continue
 
-                        aa.position.y = bb.top - aa.physicsProperties.size.y
-                        aa.physicsProperties.velocity.y *= bounce_y // stop acceleration in top and bounce
-                        aa.physicsProperties.force.y = 0
-                    }
-                    if ((aa.physicsProperties.direction.y < 0 || bb.physicsProperties.isVolume) && aa.top < bb.bottom) {
-                        aa.onCollision(bb, direction, GeneralDirection.UP)
-                        if (bb.physicsProperties.isVolume) continue;
+                    aa.position.y = bb.top - aa.physicsProperties.size.y
+                }
+                if ((aa.physicsProperties.direction.y < 0 || bb.physicsProperties.isVolume) && aa.top < bb.bottom) {
+                    aa.onCollision(bb, direction, GeneralDirection.UP)
+                    if (bb.physicsProperties.isVolume) continue
 
-                        aa.position.y = bb.bottom
-                        aa.physicsProperties.velocity.y *= bounce_y // stop acceleration in bottom and bounce
-                        aa.physicsProperties.force.y = 0
-                    }
+                    aa.position.y = bb.bottom
                 }
             }
         }
@@ -66,26 +59,14 @@ export default class Physics {
         if (!gameObject.physicsProperties.enabled) return
         if (gameObject.physicsProperties.isStatic) return
 
-        let force = gameObject.physicsProperties.force
+        let normal = gameObject.physicsProperties.direction.clone().normalize().absolute()
 
-        gameObject.physicsProperties.velocity.add(force)
-        // Set directions
-        gameObject.physicsProperties.direction.copy(gameObject.physicsProperties.velocity.dir())
-        // x collisions
-        gameObject.position.x += gameObject.physicsProperties.velocity.x * delta
+        gameObject.position.x += gameObject.physicsProperties.speed.x * delta * gameObject.physicsProperties.direction.x * normal.x
         Physics.resolveRectInRectCollision(gameObject, gameObjects, CollisionDirection.HORIZONTAL)
-        // y collisions
-        gameObject.position.y += gameObject.physicsProperties.velocity.y * delta
+
+        gameObject.position.y += gameObject.physicsProperties.speed.y * delta * gameObject.physicsProperties.direction.y * normal.y
         Physics.resolveRectInRectCollision(gameObject, gameObjects, CollisionDirection.VERTICAL)
 
-        // apply surface friction to the object's velocity
-        gameObject.physicsProperties.velocity.toZero(gameObject.physicsProperties.friction, .1) //todo madafaka
-        gameObject.physicsProperties.force.toZero(
-            new Vector2D(
-                gameObject.physicsProperties.mass,
-                gameObject.physicsProperties.mass,
-            ),
-            0.001
-        )
+        gameObject.physicsProperties.direction.set(0, 0)
     }
 }

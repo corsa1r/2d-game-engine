@@ -4,7 +4,8 @@
   "description": "",
   "main": "game/game.ts",
   "scripts": {
-    "start": "npx webpack -w"
+    "start": "npx webpack -w",
+    "host": "http-server"
   },
   "author": "",
   "license": "ISC",
