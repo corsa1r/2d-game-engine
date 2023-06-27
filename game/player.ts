@@ -61,7 +61,7 @@ export default class Player extends GameObject {
         } else if (KeyboardInput.states.KeyS) {
             this.physicsProperties.direction.y = 1
             this.lookDirectionY = 1
-        } else if(KeyboardInput.states.KeyD || KeyboardInput.states.KeyA) {
+        } else if (KeyboardInput.states.KeyD || KeyboardInput.states.KeyA) {
             this.lookDirectionY = 0
         }
 
@@ -74,6 +74,18 @@ export default class Player extends GameObject {
             bullet.position.x = this.position.x + (this.physicsProperties.size.x / 2) + (0 * this.lookDirectionX)
             bullet.position.y = this.position.y + (this.physicsProperties.size.y / 2) + (0 * this.lookDirectionY)
             this.parent.addChild(bullet)
+        }
+
+        let nextPoint = this.movePoints[0]
+        if (nextPoint) {
+            let rad = Math.atan2(nextPoint.y - this.position.y, nextPoint.x - this.position.x)
+
+            this.physicsProperties.direction.x = Math.cos(rad)
+            this.physicsProperties.direction.y = Math.sin(rad)
+
+            if (distance(this.position, nextPoint) < 10) {
+                this.movePoints.shift()
+            }
         }
     }
 

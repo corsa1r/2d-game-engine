@@ -3,6 +3,7 @@ import Level from "../engine/level"
 import chance from "../engine/math/chance"
 import rand from "../engine/math/rand"
 import Door from "./objects/door"
+import Enemy from "./objects/enemy"
 import Grass from "./objects/grass"
 import Player from "./player"
 import Rect from "./rect"
@@ -34,8 +35,12 @@ export default function generateLevel(level: Level, player: Player): Door {
 
     for (let x = 0; x < mapWidth; x++) {
         for (let y = 0; y < mapHeight; y++) {
-            if (map[x][y] === 0 && chance(45)) {
+            if (map[x][y] === 0 && chance(10)) {
                 map[x][y] = 1
+            }
+
+            if (map[x][y] === 0 && chance(1)) {
+                map[x][y] = 3
             }
         }
     }
@@ -43,7 +48,7 @@ export default function generateLevel(level: Level, player: Player): Door {
     let doorPosition = randomElementFromMatrix(map, 1)
     map[doorPosition[0]][doorPosition[1]] = 2
 
-    let objectMap = [Grass, Rect, Door]
+    let objectMap = [Grass, Rect, Door, Enemy]
     let theDoor = null
     for (let x = 0; x < mapWidth; x++) {
         for (let y = 0; y < mapHeight; y++) {

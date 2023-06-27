@@ -1,4 +1,4 @@
-import { Container } from "pixi.js"
+import { Container, FederatedEventHandler, FederatedPointerEvent } from "pixi.js"
 import GameObject from "./gameObject"
 import Physics from "./physics/physics"
 import Resources from "./resources/resources"

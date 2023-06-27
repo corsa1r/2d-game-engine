@@ -1,5 +1,4 @@
-import { Container } from "pixi.js"
-import Vector2D from "./math/vector"
+import { Container, Point } from "pixi.js"
 import PhysicsProperties from "./physics/physicsProperties"
 import Cooldown from "./time/cooldown"
 import Flag from "./states/flag"
@@ -24,6 +23,8 @@ export default abstract class GameObject extends Container {
 
     // Physics Stats
     public physicsProperties = new PhysicsProperties()
+
+    public interactive: boolean = false
 
     applyDamage(damage: number): [number, boolean] {
         if (!this.killable) return [0, false]
@@ -56,4 +57,16 @@ export default abstract class GameObject extends Container {
     abstract update(delta: number): void
 
     onCollision(bb: GameObject, collisionDirection: CollisionDirection, generalDirection?: GeneralDirection) { }
+
+
+    protected movePoints: Point[] = []
+
+    moveTo(point: Point, forceNew: boolean = false) {
+        if (forceNew) this.movePoints.length = 0
+        this.movePoints.push(point)
+    }
+
+    stopMoving() {
+        this.movePoints.length = 0
+    }
 }

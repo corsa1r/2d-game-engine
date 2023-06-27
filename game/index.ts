@@ -1,99 +1,4 @@
-// import { KeyboardInput } from "../engine/input/keyboardInput"
-// import Level from "../engine/level"
-// import chance from "../engine/math/chance"
-// import rand from "../engine/math/rand"
-// import Camera from "../engine/rendering/camera"
-// import Renderer from "../engine/rendering/renderer"
-// import Resources from "../engine/resources/resources"
-// import Texture from "../engine/resources/texture"
-// import Game from "./game"
-// import Baloon from "./objects/baloon"
-// import Grass from "./objects/grass"
-// import Player from "./player"
-// import Rect from "./rect"
-
-// let input = new KeyboardInput()
-// let renderer = new Renderer()
-// let level = new Level('default', new Resources({
-//     rect: new Texture('./game/assets/test/wall.png'),
-//     floor: new Texture('./game/assets/test/floor.png'),
-//     floor_mud_1: new Texture('./game/assets/test/floor_mud_1.png'),
-//     floor_mud_2: new Texture('./game/assets/test/floor_mud_2.png'),
-//     player: new Texture('./game/assets/test/player.png'),
-// }))
-
-// /**
-//  * @todo
-//  * 
-//  * 1. make a game plan / concept
-//  * 2. choose the quadrants size that is good for the assets
-//  * 3. find assets for that plan
-//  * 4. make a coordination system
-//  * 5. GLHFGGEZ
-//  * 6. develop the game
-//  */
-
-// let myGame = new Game(level, renderer)
-
-
-// let mapWidth = rand(68, 68)
-// let mapHeight = rand(68, 68)
-
-// let map: number[][] = []
-
-// for (let row = 0; row < mapHeight; row++) {
-//     for (let col = 0; col < mapWidth; col++) {
-//         if (!Array.isArray(map[row])) map[row] = []
-//         if (row === 0 || row === mapHeight - 1) {
-//             map[row][col] = 1
-//             continue
-//         }
-//         if (col === 0 || col === mapWidth - 1) {
-//             map[row][col] = 1
-//             continue
-//         }
-
-//         if (chance(1)) {
-//             map[row][col] = 0
-//         } else {
-//             map[row][col] = 1
-//         }
-//     }
-// }
-
-// for (let row = 0; row < map.length; row++) {
-//     for (let col = 0; col < map[row].length; col++) {
-//         switch (map[row][col]) {
-//             case 0: {
-//                 let grass = new Grass();
-//                 grass.position.x = col * 50
-//                 grass.position.y = row * 50
-//                 level.gameObjects.push(grass)
-//                 break
-//             }
-//             case 1:
-//                 let rock = new Rect();
-//                 rock.position.x = col * 50
-//                 rock.position.y = row * 50
-//                 level.gameObjects.push(rock)
-//                 break;
-//         }
-//     }
-// }
-
-// let rock = new Rect();
-// rock.position.x = 50
-// rock.position.y = 50
-// level.gameObjects.push(rock)
-
-// let player = new Player();
-// player.position.x = 400
-// player.position.y = 300
-// level.gameObjects.push(player)
-// renderer.camera.follow(player)
-
-
-import { Application, Sprite, Assets, Renderer } from 'pixi.js'
+import { Application, Sprite, Assets, Renderer, Texture, Point } from 'pixi.js'
 import to from '../engine/utils/await'
 import Game from './game'
 import { KeyboardInput } from '../engine/input/keyboardInput'
@@ -105,6 +10,9 @@ import chance from '../engine/math/chance'
 import Grass from './objects/grass'
 import { Viewport } from 'pixi-viewport'
 import generateLevel from './generate-level'
+import distance from '../engine/math/distance'
+import Physics, { PseudoPhysicsGameObject } from '../engine/physics/physics'
+import GameObject from '../engine/gameObject'
 
 (async () => {
     const app = new Application({
@@ -133,24 +41,144 @@ import generateLevel from './generate-level'
 
     document.body.appendChild(<HTMLCanvasElement>app.view);
 
+    app.stage.interactive = false
     app.stage.addChild(viewport)
 
-    Game.level.addChild(player)
-
     viewport.addChild(Game.level)
+
+    Game.level.addChild(player)
     viewport
-        // .drag()
-        // .pinch()
-        .wheel({
-            percent: 1
-        })
+    // .drag()
+    // .pinch()
+    // .wheel({
+    //     percent: 1
+    // })
     // .decelerate()
 
-    viewport.follow(door)
+    // viewport.follow(door)
 
-    setTimeout(() => {
-        viewport.follow(player, { speed: 5 })
-    }, 3000)
+    // setTimeout(() => {
+    viewport.follow(player)
+    viewport.onmouseup = function (event) {
+        // console.info({ x: player.position.x, y: player.position.y })
+        // console.warn(viewport.toWorld(event.global.x, event.global.y))
+
+        let worldPosition = viewport.toWorld(event.global.x, event.global.y)
+        // player.moveTo(worldPosition, true)
+
+        let grid = 50
+        let playerPositionInGrid = new Point(Math.floor(player.position.x / grid), Math.floor(player.position.y / grid))
+        let endpointPositionInGrid = new Point(Math.floor(worldPosition.x / grid), Math.floor(worldPosition.y / grid))
+
+        let open: PathNode[] = []
+        let closed: PathNode[] = []
+
+        let startNode: PathNode = {
+            x: playerPositionInGrid.x,
+            y: playerPositionInGrid.y,
+            width: grid,
+            height: grid,
+            obstacle: false,
+            f_cost: distance(playerPositionInGrid, endpointPositionInGrid),
+        }
+
+        console.warn(playerPositionInGrid)
+
+        function getNode(x: number, y: number, current: PathNode, represents: GameObject): PathNode {
+            let at = PseudoPhysicsGameObject.from(represents)
+            at.x = Math.floor((current.x + x) * grid)
+            at.y = Math.floor((current.y + y) * grid)
+            return {
+                x: current.x + x,
+                y: current.y + y,
+                width: grid,
+                height: grid,
+                obstacle: !Physics.canBeThere(at, Game.level.children),
+                f_cost: distance(new Point(current.x + x, current.y + y), endpointPositionInGrid),
+            }
+        }
+
+        open.push(startNode)
+
+        let deathEnd = 1000
+
+        while (--deathEnd) {
+            let current: PathNode = open
+                // .filter((a) => !a.obstacle)
+                .sort((a, b) => a.f_cost > b.f_cost ? 1 : -1)[0]
+            open.splice(open.indexOf(current), 1)
+            closed.push(current)
+
+            if (current.x === endpointPositionInGrid.x && current.y === endpointPositionInGrid.y) break
+
+
+            // Get neighbours from all direction
+            let neighbours: PathNode[] = []
+
+
+            neighbours.push(getNode(-1, 0, current, player)) // left
+            neighbours.push(getNode(1, 0, current, player)) // right
+            neighbours.push(getNode(0, -1, current, player)) // top 
+            neighbours.push(getNode(0, 1, current, player)) // bottom
+            // neighbours.push(getNode(-1, -1, current, player)) // top left
+            // neighbours.push(getNode(1, -1, current, player)) // top right
+            // neighbours.push(getNode(-1, 1, current, player)) // bottom left
+            // neighbours.push(getNode(1, 1, current, player)) // bottom right
+
+            // console.warn(neighbours)
+
+            for (let neighbour of neighbours) {
+                if (neighbour.obstacle) continue
+                if (closed.includes(neighbour)) continue
+                if (neighbour.parent === current) continue
+                if (
+                    (
+                        distance(new Point(neighbour.x, neighbour.y), endpointPositionInGrid)
+                        <
+                        distance(new Point(current.x, current.y), endpointPositionInGrid)
+                    )
+                    || !open.includes(neighbour)
+                ) {
+                    neighbour.f_cost = distance(new Point(neighbour.x, neighbour.y), endpointPositionInGrid)
+                    neighbour.parent = current
+
+                    if (!open.includes(neighbour)) {
+                        open.push(neighbour)
+                    }
+                }
+            }
+
+            // console.warn(open, closed, neighbours)
+
+            // break
+        }
+
+        // TODO Continue
+        // console.warn(playerPositionInGrid.x, playerPositionInGrid.y)
+        // sort((a, b) => a.f_cost > b.f_cost ? 1 : -1)
+        player.stopMoving()
+        closed.forEach((step, i) => {
+            // console.warn(step)
+            player.moveTo(new Point(step.x * grid + 5, step.y * grid + 5))
+            // console.warn({ x: step.x, y: step.y, h: step.h, obstacle: step.obstacle })
+
+            let ppp = Sprite.from(Texture.WHITE)
+            ppp.position.x = step.x * grid
+            ppp.position.y = step.y * grid
+            ppp.width = grid
+            ppp.height = grid
+            ppp.alpha = 0.1
+            viewport.addChild(ppp)
+        })
+
+        // let futureMe = PseudoPhysicsGameObject.from(player)
+        // futureMe.x = worldPosition.x
+        // futureMe.y = worldPosition.y
+        // console.warn(
+        //     Physics.canBeThere(futureMe, Game.level.children)
+        // )
+    };
+    // }, 3000)
 
     // Listen for frame updates
     app.ticker.maxFPS = 60
@@ -159,3 +187,13 @@ import generateLevel from './generate-level'
         Game.level.update(app.ticker.deltaMS / 1000)
     })
 })()
+
+type PathNode = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    obstacle: boolean;
+    f_cost: number;
+    parent?: PathNode;
+}

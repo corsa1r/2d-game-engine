@@ -1,18 +1,70 @@
+import { Point } from "pixi.js"
 import Bullet from "../../game/objects/bullet"
 import Player from "../../game/player"
 import GameObject from "../gameObject"
 import distance from "../math/distance"
 import Vector2D from "../math/vector"
 import { CollisionDirection, GeneralDirection } from "./physicsConstants"
+import PhysicsProperties from "./physicsProperties"
+
+export class PseudoPhysicsGameObject {
+    constructor(
+        public x: number,
+        public y: number,
+        public width: number,
+        public height: number,
+        public physicsProperties: PhysicsProperties,
+        public ref: GameObject
+    ) { }
+
+    get right(): number {
+        return this.x + this.width
+    }
+
+    get left(): number {
+        return this.x
+    }
+
+    get top(): number {
+        return this.y
+    }
+
+    get bottom(): number {
+        return this.y + this.height
+    }
+
+    static from(gameObject: GameObject) {
+        return new PseudoPhysicsGameObject(
+            gameObject.position.x,
+            gameObject.position.y,
+            gameObject.physicsProperties.size.x,
+            gameObject.physicsProperties.size.y,
+            gameObject.physicsProperties,
+            gameObject
+        )
+    }
+}
 
 export default class Physics {
 
-    static detectRectInRectCollision(aa: GameObject, bb: GameObject): boolean {
+    static detectRectInRectCollision(aa: GameObject | PseudoPhysicsGameObject, bb: GameObject): boolean {
         let fromLeft = aa.right > bb.left
         let fromRight = aa.left < bb.right
         let fromTop = aa.bottom > bb.top
         let fromBottom = aa.top < bb.bottom
         return fromLeft && fromRight && fromTop && fromBottom
+    }
+
+    static canBeThere(aa: PseudoPhysicsGameObject, gameObjects: GameObject[]) {
+        for (let bb of gameObjects) {
+            if (aa.ref === bb) continue
+            if (!bb.physicsProperties.enabled) continue // if bb has disabled physics interactions that means aa can be there
+            if (distance(new Point(aa.x, aa.y), bb.position) > 200) continue
+            if (aa.physicsProperties.ignoreCollisionsWithTags.some((igoreTag) => bb.tags.includes(igoreTag))) continue // if aa ignores collisions with bb tags it can be there
+            if (bb.physicsProperties.isVolume) continue
+            if (Physics.detectRectInRectCollision(aa, bb)) return false
+        }
+        return true
     }
 
     static resolveRectInRectCollision(aa: GameObject, gameObjects: GameObject[], direction: CollisionDirection) {
